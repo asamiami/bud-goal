@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: budgoall
+  datasource:
+    url: jdbc:postgresql://localhost:5432/budgoal
+    username: postgres
+    password: Password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      properties:
+        hibernate:
+          format-sql: true
+        show-sql: true
+        database: postgresql
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    protocol: SMTP
+    username: buddggoall@gmail.com
+    password: Babycakes05
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+logging:
+  level:
+    org.springframework.security: DEBUG
