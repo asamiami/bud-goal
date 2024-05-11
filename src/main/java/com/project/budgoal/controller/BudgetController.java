@@ -36,7 +36,6 @@ public class BudgetController {
     public ResponseEntity<ApiResponse<List<BudgetResponse>>> getAllBudget(@RequestParam Long userid){
         return budgetService.allUsersBudget(userid);
     }
-
     @PutMapping("/edit-budget/{userId}")
 
     public ResponseEntity<ApiResponse<BudgetResponse>> editBudget (@RequestBody BudgetRequest budgetRequest, @RequestParam Long budgetId){
