@@ -27,7 +27,7 @@ public class BudgetController {
     }
 
     @PutMapping ("/add-user/{userId}")
-    public ResponseEntity<ApiResponse<BudgetResponse>> addMembers (@RequestParam Long newUser, @PathVariable Long userId, @RequestParam Long budgetId){
+    public ResponseEntity<ApiResponse<BudgetResponse>> addMembers (@RequestBody Long newUser, @PathVariable Long userId, @RequestParam Long budgetId){
        return  budgetService.addBudgetMembers(userId,newUser,budgetId);
     }
 
@@ -43,10 +43,8 @@ public class BudgetController {
         return budgetService.editBudget(budgetId,budgetRequest);
     }
 
-    @PostMapping("/addTransaction/{userId}")
-
+    @PostMapping("/add-transaction/{userId}")
     public ResponseEntity<ApiResponse<BudgetResponse>> addTrasnaction (@RequestBody BudgetTransactionRequest budgetTransaction, @RequestParam Long budgetId){
-
         return budgetService.addTransaction(budgetId,budgetTransaction);
     }
 }
