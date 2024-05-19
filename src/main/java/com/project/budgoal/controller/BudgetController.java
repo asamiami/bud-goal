@@ -1,8 +1,7 @@
 package com.project.budgoal.controller;
 
 import com.project.budgoal.dtos.BudgetRequest;
-import com.project.budgoal.dtos.BudgetTransactionRequest;
-import com.project.budgoal.entites.BudgetTransaction;
+import com.project.budgoal.dtos.TransactionRequest;
 import com.project.budgoal.response.ApiResponse;
 import com.project.budgoal.response.BudgetResponse;
 import com.project.budgoal.services.BudgetService;
@@ -43,8 +42,11 @@ public class BudgetController {
         return budgetService.editBudget(budgetId,budgetRequest);
     }
 
+
+
     @PostMapping("/add-transaction/{userId}")
-    public ResponseEntity<ApiResponse<BudgetResponse>> addTrasnaction (@RequestBody BudgetTransactionRequest budgetTransaction, @RequestParam Long budgetId){
+    public ResponseEntity<ApiResponse<BudgetResponse>> addTrasnaction (@RequestBody TransactionRequest budgetTransaction, @RequestParam Long budgetId){
         return budgetService.addTransaction(budgetId,budgetTransaction);
     }
+    ///TODO: add view transactions, fix add user end point
 }

@@ -1,6 +1,6 @@
 package com.project.budgoal.response;
 
-import com.project.budgoal.entites.BudgetTransaction;
+import com.project.budgoal.entites.Transaction;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public record BudgetResponse(
 
         Long amount,
 
-        List<BudgetTransaction> budgetTransactions,
+        List<Transaction> transactions,
 
         Integer members
 ) {

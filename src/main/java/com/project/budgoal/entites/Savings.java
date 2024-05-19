@@ -8,9 +8,11 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 
@@ -22,7 +24,9 @@ public class Savings extends BaseEntity{
     @NonNull
     private String savingsName;
 
-    private Long savingAmount;
+    private Long targetAmount;
+
+
 
     @NonNull
     @Enumerated(EnumType.STRING)
@@ -30,7 +34,15 @@ public class Savings extends BaseEntity{
 
     private Integer savingsMembers;
 
-    private Period savingsDuration;
+    private LocalDate startDate;
+    private LocalDate endDate;
+
+
+    @ElementCollection
+    @CollectionTable(name = "transactions", joinColumns = @JoinColumn(name = "savings_id"))
+    @MapKeyColumn(name = "transaction_key")
+    @Column(name = "transaction_value")
+    private Map<String, Long> transactions;
 
 
     @ManyToMany

@@ -3,5 +3,5 @@ package com.project.budgoal.enums;
 public enum TransactionCatgory {
 
 
-    INCOME, EXPENSES
+    INCOME, EXPENSES, SAVINGS
 }

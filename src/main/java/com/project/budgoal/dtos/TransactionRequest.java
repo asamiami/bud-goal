@@ -4,7 +4,7 @@ import com.project.budgoal.enums.TransactionCatgory;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
-public record BudgetTransactionRequest(
+public record TransactionRequest(
         Long amount,
 
         @Enumerated(EnumType.STRING)

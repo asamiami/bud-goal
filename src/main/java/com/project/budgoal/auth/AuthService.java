@@ -11,7 +11,7 @@ import com.project.budgoal.response.ApiResponse;
 import com.project.budgoal.response.AuthResponse;
 import com.project.budgoal.security.JwtService;
 import com.project.budgoal.services.EmailService;
-import com.project.budgoal.util.UserMapper;
+
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
@@ -46,6 +46,7 @@ public class AuthService {
             newUser.setEmail(registerDto.email());
             newUser.setLastName(registerDto.lastName());
             newUser.setFirstName(registerDto.firstName());
+            newUser.setUserRoles(Roles.MEMBER);
             newUser.setPassword(passwordEncoder.encode(registerDto.password()));
             newUser.setNickName(registerDto.nickname());
 
@@ -73,7 +74,7 @@ public class AuthService {
             Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.email(), login.password()));
             String token = jwtService.generateToken(user.get());
 
-//            SecurityContextHolder.getContext().setAuthentication(auth);
+            SecurityContextHolder.getContext().setAuthentication(auth);
 
             AuthResponse authResponse = new AuthResponse(
                     token,

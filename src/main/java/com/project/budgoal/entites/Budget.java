@@ -2,13 +2,11 @@ package com.project.budgoal.entites;
 
 import com.project.budgoal.enums.Category;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
-import java.time.Period;
 import java.util.List;
 
 @Entity
@@ -29,7 +27,7 @@ public class Budget extends BaseEntity {
     private Integer budgetMembers;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userBudget")
-    private List<BudgetTransaction> transaction;
+    private List<Transaction> transaction;
 
 
     @ManyToMany

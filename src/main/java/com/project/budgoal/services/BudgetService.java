@@ -1,16 +1,17 @@
 package com.project.budgoal.services;
 
 import com.project.budgoal.dtos.BudgetRequest;
-import com.project.budgoal.dtos.BudgetTransactionRequest;
+import com.project.budgoal.dtos.TransactionRequest;
 import com.project.budgoal.entites.Budget;
-import com.project.budgoal.entites.BudgetTransaction;
+import com.project.budgoal.entites.Transaction;
 import com.project.budgoal.entites.Users;
 import com.project.budgoal.enums.TransactionCatgory;
 import com.project.budgoal.repository.BudgetRepo;
+import com.project.budgoal.repository.TransactionsRepo;
 import com.project.budgoal.repository.UserRepository;
 import com.project.budgoal.response.ApiResponse;
 import com.project.budgoal.response.BudgetResponse;
-import com.project.budgoal.util.UserMapper;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,8 @@ public class BudgetService {
     private final BudgetRepo budgetRepo;
 
     private final UserRepository userRepo;
+
+    private final TransactionsRepo transactionsRepo;
 
     public ResponseEntity createBudget(BudgetRequest budgetRequest, Long userId){
 
@@ -59,7 +62,7 @@ public class BudgetService {
         var user = userRepo.findById(userId);
         var newMember = userRepo.findById(newUserId);
 
-        if(user.isPresent() && newMember.isPresent() && budgetRepo.existsById(budgetId)){
+        if(user.isPresent() && !newMember.isPresent() && budgetRepo.existsById(budgetId)){
             List<Users> usersList = new ArrayList<>();
             usersList.add(existingUser);
             budget.setBudgetMembers(usersList.size());
@@ -121,20 +124,26 @@ public class BudgetService {
 
     }
 
-    public ResponseEntity<ApiResponse<BudgetResponse>> addTransaction(Long budgetId, BudgetTransactionRequest request) {
+    public ResponseEntity<ApiResponse<BudgetResponse>> addTransaction(Long budgetId, TransactionRequest request) {
         var budget = budgetRepo.findBudgetById(budgetId);
         if (budget == null) {
             ApiResponse apiResponse = new ApiResponse<>("Budget not found", HttpStatus.NOT_FOUND);
             return new ResponseEntity<>(apiResponse, apiResponse.getCode());
         }
 
-        List<BudgetTransaction> budgetTransactions = new ArrayList<>();
+        List<Transaction> transactions = new ArrayList<>();
+        Transaction transaction = new Transaction();
 
         if (request.category() == TransactionCatgory.INCOME) {
             budget.setBudgetAmount(budget.getBudgetAmount() + request.amount());
-            budgetTransactions.add(UserMapper.requestToTransaction(request));
-            budget.setTransaction(budgetTransactions);
+            transaction.setAmount(request.amount());
+            transaction.setUserBudget(budget);
+            transaction.setCategory(request.category());
+            transactions.add(transaction);
+            budget.setTransaction(transactions);
+            transactionsRepo.save(transaction);
             budgetRepo.save(budget);
+
             BudgetResponse budgetResponse = new BudgetResponse(budget.getBudgetName(), budget.getBudgetAmount(), budget.getTransaction(), budget.getBudgetMembers());
             ApiResponse response = new ApiResponse<>("An income has been added", HttpStatus.OK, budgetResponse);
             return new ResponseEntity<>(response, response.getCode());
@@ -147,9 +156,14 @@ public class BudgetService {
             }
 
             budget.setBudgetAmount(budget.getBudgetAmount() - request.amount());
-            budgetTransactions.add(UserMapper.requestToTransaction(request));
-            budget.setTransaction(budgetTransactions);
+            transaction.setAmount(request.amount());
+            transaction.setUserBudget(budget);
+            transaction.setCategory(request.category());
+            transactions.add(transaction);
+            budget.setTransaction(transactions);
+            budget.setTransaction(transactions);
             budgetRepo.save(budget);
+
             BudgetResponse budgetResponse = new BudgetResponse(budget.getBudgetName(), budget.getBudgetAmount(), budget.getTransaction(), budget.getBudgetMembers());
             ApiResponse response = new ApiResponse<>("An expense has been added", HttpStatus.OK, budgetResponse);
             return new ResponseEntity<>(response, response.getCode());

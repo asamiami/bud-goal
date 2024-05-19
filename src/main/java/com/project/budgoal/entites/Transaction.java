@@ -1,6 +1,5 @@
 package com.project.budgoal.entites;
 
-import com.project.budgoal.enums.Category;
 import com.project.budgoal.enums.TransactionCatgory;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -10,8 +9,9 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-
-public class BudgetTransaction extends BaseEntity{
+@AllArgsConstructor
+@NoArgsConstructor
+public class Transaction extends BaseEntity{
 
     private Long amount;
 
@@ -19,6 +19,9 @@ public class BudgetTransaction extends BaseEntity{
 
     @ManyToOne
     private  Budget userBudget;
+
+    @ManyToOne
+    private Savings savings;
 
 
 

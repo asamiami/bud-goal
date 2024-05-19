@@ -15,7 +15,6 @@ import java.util.List;
 @Entity(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Getter
 @Setter
 @Builder
@@ -33,7 +32,7 @@ public class Users extends BaseEntity implements UserDetails {
     private String verificationCode;
 
     @Enumerated
-    private Roles userRoles = Roles.MEMBER;
+    private Roles userRoles ;
 
     private AccountStatus accountStatus;
 
@@ -43,13 +42,6 @@ public class Users extends BaseEntity implements UserDetails {
     @NonNull
     private String password;
 
-//    @ManyToMany(mappedBy = "usersList")
-//
-//    private List<Budget> listOfBudgets;
-//
-//    @ManyToMany(mappedBy = "usersList")
-//
-//    private List<Savings>listOfSavings;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
