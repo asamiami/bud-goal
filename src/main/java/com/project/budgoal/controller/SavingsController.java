@@ -26,9 +26,9 @@ public class SavingsController {
         return savingsService.createSavings(savingsRequest, user);
     }
 
-    ///TODO: fix end point
+
     @PutMapping("/add-user/{user}")
-    public ResponseEntity<ApiResponse<SavingsResponse>> addMember (@RequestParam Long newUser, @RequestParam Long savingsId, @PathVariable Long user){
+    public ResponseEntity<ApiResponse<List<SavingsResponse>>> addMember (@RequestParam Long newUser, @RequestParam Long savingsId, @PathVariable Long user){
 
         return savingsService.addMembers(user, newUser, savingsId);
     }

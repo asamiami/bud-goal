@@ -3,16 +3,16 @@ package com.project.budgoal.services;
 import com.project.budgoal.dtos.BudgetRequest;
 import com.project.budgoal.dtos.TransactionRequest;
 import com.project.budgoal.entites.Budget;
-import com.project.budgoal.entites.Transaction;
 import com.project.budgoal.entites.Users;
 import com.project.budgoal.enums.TransactionCatgory;
 import com.project.budgoal.repository.BudgetRepo;
-import com.project.budgoal.repository.TransactionsRepo;
+import com.project.budgoal.repository.SavingsRepo;
 import com.project.budgoal.repository.UserRepository;
 import com.project.budgoal.response.ApiResponse;
 import com.project.budgoal.response.BudgetResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class BudgetService {
 
@@ -30,7 +33,6 @@ public class BudgetService {
 
     private final UserRepository userRepo;
 
-    private final TransactionsRepo transactionsRepo;
 
     public ResponseEntity createBudget(BudgetRequest budgetRequest, Long userId){
 
@@ -49,34 +51,35 @@ public class BudgetService {
             newBudget.setCreatedDate(LocalDate.now());
             budgetRepo.save(newBudget);
 
-            BudgetResponse budgetResponse = new BudgetResponse(newBudget.getBudgetName(), newBudget.getBudgetAmount(), newBudget.getTransaction(), newBudget.getBudgetMembers());
+            BudgetResponse budgetResponse = new BudgetResponse(newBudget.getBudgetName(), newBudget.getBudgetAmount(), newBudget.getTransactions(), newBudget.getBudgetMembers());
 
         ApiResponse response =  new ApiResponse<>(newBudget.getBudgetName() + " Budget has been created", HttpStatus.CREATED, budgetResponse);
 
         return new ResponseEntity<>(response, response.getCode());
     }
 
-    public ResponseEntity<ApiResponse<BudgetResponse>> addBudgetMembers (Long userId, Long newUserId, Long budgetId){
-        Users existingUser = userRepo.findUsersById(newUserId);
-        var budget = budgetRepo.findBudgetById(budgetId);
+    public ResponseEntity<ApiResponse<List<BudgetResponse>>> addBudgetMembers (Long userId, Long newUserId, Long budgetId){
+
         var user = userRepo.findById(userId);
-        var newMember = userRepo.findById(newUserId);
+        List<BudgetResponse> listOfMembers = new ArrayList<>();
+        if(user.isPresent() && userRepo.existsById(newUserId)) {
+            var newUSer = userRepo.findUsersById(newUserId);
+            var budget = budgetRepo.findBudgetById(budgetId);
 
-        if(user.isPresent() && !newMember.isPresent() && budgetRepo.existsById(budgetId)){
-            List<Users> usersList = new ArrayList<>();
-            usersList.add(existingUser);
-            budget.setBudgetMembers(usersList.size());
-            budget.setUsersList(usersList);
-            budgetRepo.save(budget);
-
-            BudgetResponse budgetResponse = new BudgetResponse(budget.getBudgetName(),budget.getBudgetAmount(), budget.getTransaction(), budget.getBudgetMembers());
-
-            ApiResponse response = new ApiResponse<>("User added succesfully", HttpStatus.OK, budgetResponse);
-
-            return new ResponseEntity<>(response, response.getCode());
-        }else{
+            if (!budget.getUsersList().contains(newUserId)) {
+               budget.addUsersToUserList(newUSer);
+                budgetRepo.save(budget);
+                BudgetResponse budgetResponse = new BudgetResponse(budget.getBudgetName(), budget.getBudgetAmount(), budget.getTransactions(), budget.getBudgetMembers());
+                listOfMembers.add(budgetResponse);
+                ApiResponse response = new ApiResponse<>("User added succesfully", HttpStatus.OK, listOfMembers);
+                return new ResponseEntity<>(response, response.getCode());
+            } else {
+                ApiResponse response = new ApiResponse<>("This User already exists in the Budget", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(response, response.getCode());
+            }
+        }else {
             ApiResponse response = new ApiResponse<>("Kindly ensure the user is a registered user", HttpStatus.BAD_REQUEST);
-            return  new ResponseEntity<>(response, response.getCode());
+            return new ResponseEntity<>(response, response.getCode());
         }
 
     }
@@ -90,7 +93,7 @@ public class BudgetService {
             var budgets = budgetRepo.findAllByUsersList(user);
             List<BudgetResponse> listOfBudgets = new ArrayList<>();
             for (Budget budget : budgets) {
-                BudgetResponse budgetResponse = new BudgetResponse(budget.getBudgetName(), budget.getBudgetAmount(), budget.getTransaction(), budget.getBudgetMembers());
+                BudgetResponse budgetResponse = new BudgetResponse(budget.getBudgetName(), budget.getBudgetAmount(), budget.getTransactions(), budget.getBudgetMembers());
                 listOfBudgets.add(budgetResponse);
             }
             if (!listOfBudgets.isEmpty()) {
@@ -102,8 +105,6 @@ public class BudgetService {
         ApiResponse apiResponse = new ApiResponse<>("This user has no budget", HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(apiResponse, apiResponse.getCode());
     }
-
-
 
 
 
@@ -125,53 +126,65 @@ public class BudgetService {
     }
 
     public ResponseEntity<ApiResponse<BudgetResponse>> addTransaction(Long budgetId, TransactionRequest request) {
-        var budget = budgetRepo.findBudgetById(budgetId);
-        if (budget == null) {
-            ApiResponse apiResponse = new ApiResponse<>("Budget not found", HttpStatus.NOT_FOUND);
-            return new ResponseEntity<>(apiResponse, apiResponse.getCode());
-        }
+        var budget1 = budgetRepo.findById(budgetId);
 
-        List<Transaction> transactions = new ArrayList<>();
-        Transaction transaction = new Transaction();
 
-        if (request.category() == TransactionCatgory.INCOME) {
-            budget.setBudgetAmount(budget.getBudgetAmount() + request.amount());
-            transaction.setAmount(request.amount());
-            transaction.setUserBudget(budget);
-            transaction.setCategory(request.category());
-            transactions.add(transaction);
-            budget.setTransaction(transactions);
-            transactionsRepo.save(transaction);
-            budgetRepo.save(budget);
 
-            BudgetResponse budgetResponse = new BudgetResponse(budget.getBudgetName(), budget.getBudgetAmount(), budget.getTransaction(), budget.getBudgetMembers());
-            ApiResponse response = new ApiResponse<>("An income has been added", HttpStatus.OK, budgetResponse);
-            return new ResponseEntity<>(response, response.getCode());
-        }
+        Map<String, Long> transactions = new HashMap<>();
 
-        if (request.category() == TransactionCatgory.EXPENSES) {
-            if (request.amount() > budget.getBudgetAmount()) {
-                ApiResponse response = new ApiResponse<>("This expense is beyond your budget", HttpStatus.BAD_REQUEST);
+        if (budget1.isPresent()) {
+            Budget budget = budgetRepo.findBudgetById(budgetId);
+
+            if (request.category() == TransactionCatgory.INCOME) {
+                budget.setBudgetAmount(budget.getBudgetAmount() + request.amount());
+
+
+                budget.addTransactionToTransactionsList(request.category().toString(), request.amount());
+
+                budgetRepo.save(budget);
+                BudgetResponse budgetResponse = new BudgetResponse(budget.getBudgetName(), budget.getBudgetAmount(), budget.getTransactions(), budget.getBudgetMembers());
+                ApiResponse response = new ApiResponse<>("An income has been added", HttpStatus.OK, budgetResponse);
+                return new ResponseEntity<>(response, response.getCode());
+            } else if (request.category() == TransactionCatgory.EXPENSES && request.amount() < budget.getBudgetAmount()) {
+                budget.setBudgetAmount(budget.getBudgetAmount() - request.amount());
+
+                budget.addTransactionToTransactionsList(request.category().toString(), request.amount());
+                budgetRepo.save(budget);
+                BudgetResponse budgetResponse = new BudgetResponse(budget.getBudgetName(), budget.getBudgetAmount(), budget.getTransactions(), budget.getBudgetMembers());
+                ApiResponse response = new ApiResponse<>("An expense has been added", HttpStatus.OK, budgetResponse);
+                return new ResponseEntity<>(response, response.getCode());
+            } else if (request.amount() > budget.getBudgetAmount()) {
+                ApiResponse response = new ApiResponse<>("This is beyond your budget. Please let us try and stick to the money available", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(response, response.getCode());
+            }else {
+                ApiResponse response = new ApiResponse<>("This category is not allowed", HttpStatus.BAD_REQUEST);
                 return new ResponseEntity<>(response, response.getCode());
             }
 
-            budget.setBudgetAmount(budget.getBudgetAmount() - request.amount());
-            transaction.setAmount(request.amount());
-            transaction.setUserBudget(budget);
-            transaction.setCategory(request.category());
-            transactions.add(transaction);
-            budget.setTransaction(transactions);
-            budget.setTransaction(transactions);
-            budgetRepo.save(budget);
 
-            BudgetResponse budgetResponse = new BudgetResponse(budget.getBudgetName(), budget.getBudgetAmount(), budget.getTransaction(), budget.getBudgetMembers());
-            ApiResponse response = new ApiResponse<>("An expense has been added", HttpStatus.OK, budgetResponse);
+        }else {
+            ApiResponse response = new ApiResponse<>("This budget does not exist", HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(response, response.getCode());
+
         }
 
-        ApiResponse response = new ApiResponse<>("Invalid transaction category", HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>(response, response.getCode());
     }
 
 
+    public ResponseEntity<ApiResponse<Map<String, Long>>> viewTransactions (Long budgetId){
+        var budget =  budgetRepo.findById(budgetId);
+
+        if (budget.isPresent()){
+            Budget budgets = budgetRepo.findBudgetById(budgetId);
+
+            Map<String, Long> transactions = budgets.getTransactions();
+
+            ApiResponse apiResponse = new ApiResponse<>("The following are the transactions in " + budgets.getBudgetName(), HttpStatus.OK, transactions);
+            return new ResponseEntity<>(apiResponse, apiResponse.getCode());
+        } else {
+            ApiResponse apiResponse = new ApiResponse<>("This budget does not exist", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(apiResponse, apiResponse.getCode());
+        }
+    }
 }
+

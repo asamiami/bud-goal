@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -26,8 +27,8 @@ public class Budget extends BaseEntity {
 
     private Integer budgetMembers;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userBudget")
-    private List<Transaction> transaction;
+    @ElementCollection
+    private Map<String, Long> transactions;
 
 
     @ManyToMany
@@ -40,4 +41,13 @@ public class Budget extends BaseEntity {
     private List<Users> usersList;
 
 
+    public boolean addUsersToUserList (Users user){
+
+        return usersList.add(user);
+
+    }
+
+    public Long addTransactionToTransactionsList (String transactionName, Long amount){
+        return transactions.put(transactionName, amount);
+    }
 }

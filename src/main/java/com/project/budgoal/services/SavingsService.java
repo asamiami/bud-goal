@@ -3,12 +3,10 @@ package com.project.budgoal.services;
 import com.project.budgoal.dtos.SavingsRequest;
 import com.project.budgoal.dtos.TransactionRequest;
 import com.project.budgoal.entites.Savings;
-import com.project.budgoal.entites.Transaction;
 import com.project.budgoal.entites.Users;
 import com.project.budgoal.enums.Roles;
-import com.project.budgoal.enums.TransactionCatgory;
+import com.project.budgoal.repository.BudgetRepo;
 import com.project.budgoal.repository.SavingsRepo;
-import com.project.budgoal.repository.TransactionsRepo;
 import com.project.budgoal.repository.UserRepository;
 import com.project.budgoal.response.ApiResponse;
 import com.project.budgoal.response.SavingsResponse;
@@ -31,28 +29,30 @@ public class SavingsService {
 
     private final SavingsRepo savingsRepo;
     private final UserRepository userRepo;
-    private final TransactionsRepo transactionsRepo;
+
+
 
 
     public ResponseEntity<ApiResponse<SavingsResponse>> createSavings(SavingsRequest request, Long userId) {
 
         var user = userRepo.findById(userId);
-
-
         if (user.isPresent()) {
             Users users = userRepo.findUsersById(userId);
             List<Users> usersList = new ArrayList<>();
-            Savings savings = new Savings();
 
+            Savings savings = new Savings();
             savings.setTargetAmount(request.amount());
             users.setUserRoles(Roles.GROUP_OWNER);
             usersList.add(users);
+
             savings.setUsersList(usersList);
             savings.setTargetAmount(request.amount());
             savings.setStartDate(request.start());
+
             savings.setEndDate(request.endDate());
             savings.setSavingsName(request.name());
             savings.setSavingsCategory(request.category());
+
             savings.setCreatedDate(LocalDate.now());
             userRepo.save(users);
             savingsRepo.save(savings);
@@ -68,24 +68,28 @@ public class SavingsService {
     }
 
 
-    public ResponseEntity<ApiResponse<SavingsResponse>> addMembers(Long userId, Long newUserId, Long savingsId) {
+    public ResponseEntity<ApiResponse<List<SavingsResponse>>> addMembers(Long userId, Long newUserId, Long savingsId) {
 
         var user = userRepo.findById(userId);
 
-        if (user.isPresent()) {
-            var newUSer = userRepo.findUsersById(newUserId);
+        List<SavingsResponse> listOfMembers = new ArrayList<>();
+        if (user.isPresent() && userRepo.existsById(newUserId)) {
+            var newUser = userRepo.findUsersById(newUserId);
             var savngs = savingsRepo.findSavingsById(savingsId);
             List<Users> usersList = new ArrayList<>();
-            if (!savngs.getUsersList().contains(newUSer)) {
-                newUSer.setUserRoles(Roles.GROUP_MEMBER);
-                usersList.add(newUSer);
-                savngs.setUsersList(usersList);
+            if (!savngs.getUsersList().contains(newUser)) {
+
+                newUser.setUserRoles(Roles.GROUP_MEMBER);
+
+                savngs.addUsersToUserList(newUser);
+
                 savngs.setSavingsMembers(usersList.size());
-                userRepo.save(newUSer);
+                userRepo.save(newUser);
                 savingsRepo.save(savngs);
                 Period period = Period.between(savngs.getEndDate(), savngs.getStartDate());
                 SavingsResponse savingsResponse = new SavingsResponse(savngs.getSavingsName(), period.getMonths() + " months", savngs.getSavingsCategory(), savngs.getSavingsMembers(), savngs.getTargetAmount(), savngs.getTransactions().size());
-                ApiResponse response = new ApiResponse<>(newUSer.getNickName() + " has been added to the savings list", HttpStatus.OK, savingsResponse);
+                listOfMembers.add(savingsResponse);
+                ApiResponse response = new ApiResponse<>(newUser.getNickName() + " has been added to the savings list", HttpStatus.OK, listOfMembers);
                 return new ResponseEntity<>(response, response.getCode());
             } else {
                 ApiResponse resp = new ApiResponse<>("User is on the savings list", HttpStatus.BAD_REQUEST);
@@ -132,7 +136,7 @@ public class SavingsService {
         if (savingsRepo.existsById(savingsId)) {
             List<Users> users = savings.getUsersList();
             for (Users users1 : users) {
-                UserResponse userResponse = new UserResponse(users1.getFirstName() + users1.getLastName(), users1.getNickName());
+                UserResponse userResponse = new UserResponse(users1.getFirstName() + " " + users1.getLastName(), users1.getNickName());
                 userResponses.add(userResponse);
             }
             ApiResponse apiResponse = new ApiResponse<>("The members of the Savings are below", HttpStatus.OK, userResponses);
@@ -148,13 +152,9 @@ public class SavingsService {
 
 
 
-        public ResponseEntity<ApiResponse<SavingsResponse>> addTransaction (Long savingsId, TransactionRequest
-        transactionRequest, Long userId){
-
+        public ResponseEntity<ApiResponse<SavingsResponse>> addTransaction (Long savingsId, TransactionRequest transactionRequest, Long userId){
 
             var user1 = userRepo.findById(userId);
-
-            Transaction transaction = new Transaction();
             Map<String, Long> transactionList = new HashMap<>();
 
             var savings = savingsRepo.findSavingsById(savingsId);
@@ -164,13 +164,7 @@ public class SavingsService {
                 Users user = userRepo.findUsersById(userId);
                 if (savings.getUsersList().contains(user)) {
 
-
-                    transaction.setSavings(savings);
-                    transaction.setAmount(transactionRequest.amount());
-                    transaction.setCategory(TransactionCatgory.SAVINGS);
-                    transactionList.put(user.getNickName(), transactionRequest.amount());
-                    savings.setTransactions(transactionList);
-                    transactionsRepo.save(transaction);
+                    savings.addTransactionToTransactionsList(user.getNickName(), transactionRequest.amount());
                     savingsRepo.save(savings);
 
                     Long remainder = savings.getTargetAmount() - transactionRequest.amount();
@@ -198,10 +192,7 @@ public class SavingsService {
 
 
         public ResponseEntity<ApiResponse<Map<String, Long>>> viewTransaction (Long savingsId){
-
-
             var savins = savingsRepo.findById(savingsId);
-
 
             if (savins.isPresent()) {
 

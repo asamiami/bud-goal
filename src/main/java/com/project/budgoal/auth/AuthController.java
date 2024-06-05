@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-
-    @SneakyThrows
+    
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<String>> signup (@RequestBody RegisterDto signupRequest)  {
 
@@ -31,12 +30,4 @@ public class AuthController {
         return authService.loginUser(loginRequest);
     }
 
-    @PostMapping("/confirm-email-address")
-
-    public ResponseEntity<ApiResponse<String>> confirmEmail(@RequestParam String token){
-
-        var response =  authService.confirmEmail(token);
-
-        return new ResponseEntity<>(response, response.getCode());
-    }
 }

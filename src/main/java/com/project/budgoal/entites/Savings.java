@@ -2,15 +2,12 @@ package com.project.budgoal.entites;
 
 import com.project.budgoal.enums.Category;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +36,6 @@ public class Savings extends BaseEntity{
 
 
     @ElementCollection
-    @CollectionTable(name = "transactions", joinColumns = @JoinColumn(name = "savings_id"))
     @MapKeyColumn(name = "transaction_key")
     @Column(name = "transaction_value")
     private Map<String, Long> transactions;
@@ -48,4 +44,15 @@ public class Savings extends BaseEntity{
     @ManyToMany
 
     private List<Users> usersList;
+
+
+    public boolean addUsersToUserList (Users user){
+
+        return usersList.add(user);
+
+    }
+
+    public Long addTransactionToTransactionsList (String transactionName, Long amount){
+        return transactions.put(transactionName, amount);
+    }
 }

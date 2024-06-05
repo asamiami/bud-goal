@@ -1,8 +1,6 @@
 package com.project.budgoal.response;
 
-import com.project.budgoal.entites.Transaction;
-
-import java.util.List;
+import java.util.Map;
 
 public record BudgetResponse(
 
@@ -10,7 +8,7 @@ public record BudgetResponse(
 
         Long amount,
 
-        List<Transaction> transactions,
+        Map<String, Long> transactions,
 
         Integer members
 ) {
