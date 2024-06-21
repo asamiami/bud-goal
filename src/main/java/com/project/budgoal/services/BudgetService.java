@@ -84,7 +84,6 @@ public class BudgetService {
 
     }
 
-
     public ResponseEntity<ApiResponse<List<BudgetResponse>>> allUsersBudget(Long userId){
 
         var user = userRepo.findUsersById(userId);
