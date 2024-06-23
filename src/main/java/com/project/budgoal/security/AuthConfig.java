@@ -38,8 +38,11 @@ public class AuthConfig {
     }
 
     @Bean
-    public AuthenticationManager authManager(AuthenticationConfiguration configuration) throws  Exception{
-        return configuration.getAuthenticationManager();
-
+    public AuthenticationManager authManager(AuthenticationConfiguration configuration) throws Exception {
+        try {
+            return configuration.getAuthenticationManager();
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid Email or Password", e);
+        }
     }
 }

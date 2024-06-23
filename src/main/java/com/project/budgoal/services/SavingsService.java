@@ -1,25 +1,22 @@
 package com.project.budgoal.services;
 
-import com.project.budgoal.dtos.SavingsRequest;
-import com.project.budgoal.dtos.TransactionRequest;
+import com.project.budgoal.dtos.request.SavingsRequest;
+import com.project.budgoal.dtos.request.TransactionRequest;
 import com.project.budgoal.entites.Savings;
 import com.project.budgoal.entites.Users;
 import com.project.budgoal.enums.Roles;
-import com.project.budgoal.repository.BudgetRepo;
 import com.project.budgoal.repository.SavingsRepo;
 import com.project.budgoal.repository.UserRepository;
-import com.project.budgoal.response.ApiResponse;
-import com.project.budgoal.response.SavingsResponse;
-import com.project.budgoal.response.UserResponse;
+import com.project.budgoal.dtos.response.ApiResponse;
+import com.project.budgoal.dtos.response.SavingsResponse;
+import com.project.budgoal.dtos.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +30,7 @@ public class SavingsService {
 
 
 
-    public ResponseEntity<ApiResponse<SavingsResponse>> createSavings(SavingsRequest request, Long userId) {
+    public ApiResponse<SavingsResponse> createSavings(SavingsRequest request, Long userId) {
 
         var user = userRepo.findById(userId);
         if (user.isPresent()) {
@@ -58,17 +55,18 @@ public class SavingsService {
             savingsRepo.save(savings);
             Period duration = Period.between(request.endDate(), request.start());
             SavingsResponse savingsResponse = new SavingsResponse(savings.getSavingsName(), duration.getMonths() + " months", savings.getSavingsCategory(), savings.getSavingsMembers(), savings.getTargetAmount(), 0);
-            ApiResponse<SavingsResponse> response = new ApiResponse<>(savings.getSavingsName() + " Savings created successfully", HttpStatus.CREATED, savingsResponse);
-            return new ResponseEntity<>(response, response.getCode());
+            return  new ApiResponse<>(savings.getSavingsName() + " Savings created successfully", HttpStatus.CREATED, savingsResponse);
+
         } else {
-            ApiResponse response = new ApiResponse<>("Kindly register to create a savings plan", HttpStatus.BAD_REQUEST);
-            return new ResponseEntity<>(response, response.getCode());
+            return new ApiResponse<>("Kindly register to create a savings plan", HttpStatus.BAD_REQUEST);
+
         }
 
     }
 
 
-    public ResponseEntity<ApiResponse<List<SavingsResponse>>> addMembers(Long userId, Long newUserId, Long savingsId) {
+
+    public ApiResponse<List<SavingsResponse>> addMembers(Long userId, Long newUserId, Long savingsId) {
 
         var user = userRepo.findById(userId);
 
@@ -89,19 +87,19 @@ public class SavingsService {
                 Period period = Period.between(savngs.getEndDate(), savngs.getStartDate());
                 SavingsResponse savingsResponse = new SavingsResponse(savngs.getSavingsName(), period.getMonths() + " months", savngs.getSavingsCategory(), savngs.getSavingsMembers(), savngs.getTargetAmount(), savngs.getTransactions().size());
                 listOfMembers.add(savingsResponse);
-                ApiResponse response = new ApiResponse<>(newUser.getNickName() + " has been added to the savings list", HttpStatus.OK, listOfMembers);
-                return new ResponseEntity<>(response, response.getCode());
+                return new ApiResponse<>(newUser.getNickName() + " has been added to the savings list", HttpStatus.OK, listOfMembers);
+
             } else {
-                ApiResponse resp = new ApiResponse<>("User is on the savings list", HttpStatus.BAD_REQUEST);
-                return new ResponseEntity<>(resp, resp.getCode());
+                return new ApiResponse<>("User is on the savings list", HttpStatus.BAD_REQUEST);
+
             }
         } else {
-            ApiResponse response = new ApiResponse<>("User is not registerd", HttpStatus.BAD_REQUEST);
-            return new ResponseEntity<>(response, response.getCode());
+            return new ApiResponse<>("User is not registerd", HttpStatus.BAD_REQUEST);
+
         }
     }
 
-    public ResponseEntity<ApiResponse<List<SavingsResponse>>> viewAllSavings(Long userId) {
+    public ApiResponse<List<SavingsResponse>> viewAllSavings(Long userId) {
         var user = userRepo.findById(userId);
 
         List<SavingsResponse> savingsResponseList = new ArrayList<>();
@@ -117,20 +115,20 @@ public class SavingsService {
             }
 
             if (savingsResponseList.isEmpty()) {
-                ApiResponse apiResponse = new ApiResponse<>("This user has no savings", HttpStatus.BAD_REQUEST);
-                return new ResponseEntity<>(apiResponse, apiResponse.getCode());
+                return new ApiResponse<>("This user has no savings", HttpStatus.BAD_REQUEST);
+
             }
 
-            ApiResponse apiResponse = new ApiResponse<>("Here are your list of savings", HttpStatus.OK, savingsResponseList);
-            return new ResponseEntity<>(apiResponse, apiResponse.getCode());
+            return new ApiResponse<>("Here are your list of savings", HttpStatus.OK, savingsResponseList);
+
         }
 
-        ApiResponse apiResponse = new ApiResponse<>("User not found", HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>(apiResponse, apiResponse.getCode());
+        return new ApiResponse<>("User not found", HttpStatus.BAD_REQUEST);
+
     }
 
 
-    public ResponseEntity<ApiResponse<List<UserResponse>>> viewMembers(Long savingsId) {
+    public ApiResponse<List<UserResponse>> viewMembers(Long savingsId) {
         var savings = savingsRepo.findSavingsById(savingsId);
         List<UserResponse> userResponses = new ArrayList<>();
         if (savingsRepo.existsById(savingsId)) {
@@ -139,12 +137,12 @@ public class SavingsService {
                 UserResponse userResponse = new UserResponse(users1.getFirstName() + " " + users1.getLastName(), users1.getNickName());
                 userResponses.add(userResponse);
             }
-            ApiResponse apiResponse = new ApiResponse<>("The members of the Savings are below", HttpStatus.OK, userResponses);
-            return new ResponseEntity<>(apiResponse, apiResponse.getCode());
+            return new ApiResponse<>("The members of the Savings are below", HttpStatus.OK, userResponses);
+
 
         } else {
-            ApiResponse apiResponse = new ApiResponse<>("Saving does not exist", HttpStatus.BAD_REQUEST, userResponses);
-            return new ResponseEntity<>(apiResponse, apiResponse.getCode());
+            return new ApiResponse<>("Saving does not exist", HttpStatus.BAD_REQUEST, userResponses);
+
         }
     }
 
@@ -152,11 +150,9 @@ public class SavingsService {
 
 
 
-        public ResponseEntity<ApiResponse<SavingsResponse>> addTransaction (Long savingsId, TransactionRequest transactionRequest, Long userId){
+        public ApiResponse<SavingsResponse> addTransaction (Long savingsId, TransactionRequest transactionRequest, Long userId){
 
             var user1 = userRepo.findById(userId);
-            Map<String, Long> transactionList = new HashMap<>();
-
             var savings = savingsRepo.findSavingsById(savingsId);
 
             if (user1.isPresent()) {
@@ -167,42 +163,39 @@ public class SavingsService {
                     savings.addTransactionToTransactionsList(user.getNickName(), transactionRequest.amount());
                     savingsRepo.save(savings);
 
-                    Long remainder = savings.getTargetAmount() - transactionRequest.amount();
+                    long remainder = savings.getTargetAmount() - transactionRequest.amount();
 
                     Period period = Period.between(savings.getEndDate(), savings.getStartDate());
                     SavingsResponse savingsResponse = new SavingsResponse(savings.getSavingsName(), period.getMonths() + " months", savings.getSavingsCategory(), savings.getUsersList().size(), savings.getTargetAmount(), savings.getTransactions().size());
 
-                    ApiResponse apiResponse = new ApiResponse<>(user.getNickName() + " has added " + transactionRequest.amount() + " to " + savings.getSavingsName() + ". We have " + remainder + " to go", HttpStatus.OK, savingsResponse);
-                    return new ResponseEntity<>(apiResponse, apiResponse.getCode());
+                    return new ApiResponse<>(user.getNickName() + " has added " + transactionRequest.amount() + " to " + savings.getSavingsName() + ". We have " + remainder + " to go", HttpStatus.OK, savingsResponse);
+
 
                 } else {
-                    ApiResponse response = new ApiResponse<>("This user is not a member", HttpStatus.BAD_REQUEST);
-                    return new ResponseEntity<>(response, response.getCode());
+                    return new ApiResponse<>("This user is not a member", HttpStatus.BAD_REQUEST);
                 }
 
             } else {
 
-                ApiResponse resp = new ApiResponse<>("Kindly register to create savings", HttpStatus.BAD_REQUEST);
-
-                return new ResponseEntity<>(resp, resp.getCode());
+                return new ApiResponse<>("Kindly register to create savings", HttpStatus.BAD_REQUEST);
             }
 
 
         }
 
 
-        public ResponseEntity<ApiResponse<Map<String, Long>>> viewTransaction (Long savingsId){
+        public ApiResponse<Map<String, Long>> viewTransaction (Long savingsId){
             var savins = savingsRepo.findById(savingsId);
 
             if (savins.isPresent()) {
 
                 Savings savings = savingsRepo.findSavingsById(savingsId);
                 Map<String, Long> transactionResponses = savings.getTransactions();
-                ApiResponse apiResponse = new ApiResponse<>("The following are the transactions in " + savings.getSavingsName(), HttpStatus.OK, transactionResponses);
-                return new ResponseEntity<>(apiResponse, apiResponse.getCode());
+                return new ApiResponse<>("The following are the transactions in " + savings.getSavingsName(), HttpStatus.OK, transactionResponses);
+
             } else {
-                ApiResponse apiResponse = new ApiResponse<>("This savings does not exist", HttpStatus.BAD_REQUEST);
-                return new ResponseEntity<>(apiResponse, apiResponse.getCode());
+                return new ApiResponse<>("This savings does not exist", HttpStatus.BAD_REQUEST);
+
             }
         }
 

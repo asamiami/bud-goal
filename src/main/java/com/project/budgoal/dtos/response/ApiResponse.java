@@ -1,4 +1,4 @@
-package com.project.budgoal.response;
+package com.project.budgoal.dtos.response;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

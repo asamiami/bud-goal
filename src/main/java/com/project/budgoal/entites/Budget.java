@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,12 +17,12 @@ import java.util.Map;
 @NoArgsConstructor
 public class Budget extends BaseEntity {
 
-    @NonNull
+
     private String budgetName;
 
     private Long budgetAmount;
 
-    @NonNull
+
     @Enumerated(EnumType.STRING)
     private Category budgetCategory;
 
@@ -38,7 +39,7 @@ public class Budget extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
 
-    private List<Users> usersList;
+    private List<Users> usersList = new ArrayList<>();
 
 
     public boolean addUsersToUserList (Users user){

@@ -20,13 +20,13 @@ import java.util.List;
 @Builder
 public class Users extends BaseEntity implements UserDetails {
 
-    @NonNull
+
     private String firstName;
 
-    @NonNull
+
     private String lastName;
 
-    @NonNull
+
     private String nickName;
 
     private String verificationCode;
@@ -36,10 +36,10 @@ public class Users extends BaseEntity implements UserDetails {
 
     private AccountStatus accountStatus;
 
-    @NonNull
+
     private String email;
 
-    @NonNull
+
     private String password;
 
 

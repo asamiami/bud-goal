@@ -1,4 +1,4 @@
-package com.project.budgoal.dtos;
+package com.project.budgoal.dtos.request;
 
 import com.project.budgoal.enums.Category;
 import jakarta.persistence.EnumType;

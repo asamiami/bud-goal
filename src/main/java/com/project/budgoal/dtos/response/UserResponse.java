@@ -1,4 +1,4 @@
-package com.project.budgoal.response;
+package com.project.budgoal.dtos.response;
 
 public record UserResponse(
         String name,

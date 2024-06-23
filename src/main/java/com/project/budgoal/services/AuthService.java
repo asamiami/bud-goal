@@ -1,18 +1,15 @@
-package com.project.budgoal.auth;
+package com.project.budgoal.services;
 
-import com.project.budgoal.dtos.LoginRequest;
-import com.project.budgoal.dtos.RegisterDto;
+import com.project.budgoal.dtos.request.LoginRequest;
+import com.project.budgoal.dtos.request.RegisterDto;
 import com.project.budgoal.entites.Users;
-import com.project.budgoal.enums.AccountStatus;
 import com.project.budgoal.enums.Roles;
-import com.project.budgoal.exceptions.BudgoalException;
 import com.project.budgoal.repository.UserRepository;
-import com.project.budgoal.response.ApiResponse;
-import com.project.budgoal.response.AuthResponse;
+import com.project.budgoal.dtos.response.ApiResponse;
+import com.project.budgoal.dtos.response.AuthResponse;
 import com.project.budgoal.security.JwtService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor

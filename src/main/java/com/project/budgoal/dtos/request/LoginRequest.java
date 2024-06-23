@@ -1,4 +1,4 @@
-package com.project.budgoal.dtos;
+package com.project.budgoal.dtos.request;
 
 public record LoginRequest(
         String email,

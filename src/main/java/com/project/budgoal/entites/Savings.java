@@ -18,14 +18,14 @@ import java.util.Map;
 @NoArgsConstructor
 public class Savings extends BaseEntity{
 
-    @NonNull
+
     private String savingsName;
 
     private Long targetAmount;
 
 
 
-    @NonNull
+
     @Enumerated(EnumType.STRING)
     private Category savingsCategory;
 
@@ -46,9 +46,9 @@ public class Savings extends BaseEntity{
     private List<Users> usersList;
 
 
-    public boolean addUsersToUserList (Users user){
+    public void addUsersToUserList (Users user){
 
-        return usersList.add(user);
+         usersList.add(user);
 
     }
 

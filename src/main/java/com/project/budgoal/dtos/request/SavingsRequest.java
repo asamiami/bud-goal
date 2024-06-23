@@ -1,4 +1,4 @@
-package com.project.budgoal.dtos;
+package com.project.budgoal.dtos.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.budgoal.enums.Category;

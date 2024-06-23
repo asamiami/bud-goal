@@ -1,4 +1,4 @@
-package com.project.budgoal.response;
+package com.project.budgoal.dtos.response;
 
 import com.project.budgoal.enums.Category;
 import lombok.Setter;
