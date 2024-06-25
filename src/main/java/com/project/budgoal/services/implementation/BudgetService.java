@@ -1,4 +1,4 @@
-package com.project.budgoal.services;
+package com.project.budgoal.services.implementation;
 
 import com.project.budgoal.dtos.request.BudgetRequest;
 import com.project.budgoal.dtos.request.TransactionRequest;
@@ -10,6 +10,7 @@ import com.project.budgoal.repository.UserRepository;
 import com.project.budgoal.dtos.response.ApiResponse;
 import com.project.budgoal.dtos.response.BudgetResponse;
 
+import com.project.budgoal.services.BudgetServ;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,13 +25,14 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class BudgetService {
+public class BudgetService implements BudgetServ {
 
     private final BudgetRepo budgetRepo;
 
     private final UserRepository userRepo;
 
 
+    @Override
     public ApiResponse<BudgetResponse> createBudget(BudgetRequest budgetRequest, Long userId){
 
         var user = userRepo.findUsersById(userId);

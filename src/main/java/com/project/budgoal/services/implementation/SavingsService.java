@@ -1,4 +1,4 @@
-package com.project.budgoal.services;
+package com.project.budgoal.services.implementation;
 
 import com.project.budgoal.dtos.request.SavingsRequest;
 import com.project.budgoal.dtos.request.TransactionRequest;
@@ -10,6 +10,7 @@ import com.project.budgoal.repository.UserRepository;
 import com.project.budgoal.dtos.response.ApiResponse;
 import com.project.budgoal.dtos.response.SavingsResponse;
 import com.project.budgoal.dtos.response.UserResponse;
+import com.project.budgoal.services.SavingsServ;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class SavingsService {
+public class SavingsService implements SavingsServ {
 
     private final SavingsRepo savingsRepo;
     private final UserRepository userRepo;

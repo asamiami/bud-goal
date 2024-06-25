@@ -5,7 +5,8 @@ import com.project.budgoal.dtos.request.TransactionRequest;
 import com.project.budgoal.dtos.response.ApiResponse;
 import com.project.budgoal.dtos.response.SavingsResponse;
 import com.project.budgoal.dtos.response.UserResponse;
-import com.project.budgoal.services.SavingsService;
+import com.project.budgoal.services.SavingsServ;
+import com.project.budgoal.services.implementation.SavingsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SavingsController {
 
-    private final SavingsService savingsService;
+    private final SavingsServ savingsService;
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<SavingsResponse>> createSavings (@RequestBody SavingsRequest savingsRequest, @RequestParam Long user){

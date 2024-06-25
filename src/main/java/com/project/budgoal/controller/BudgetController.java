@@ -4,7 +4,7 @@ import com.project.budgoal.dtos.request.BudgetRequest;
 import com.project.budgoal.dtos.request.TransactionRequest;
 import com.project.budgoal.dtos.response.ApiResponse;
 import com.project.budgoal.dtos.response.BudgetResponse;
-import com.project.budgoal.services.BudgetService;
+import com.project.budgoal.services.BudgetServ;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BudgetController {
 
-    private final BudgetService budgetService;
+    private final BudgetServ budgetService;
 
 
     @PostMapping("/create-budget")

@@ -21,7 +21,6 @@ public class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     private LocalDate createdDate;
 
     private LocalDateTime updatedDate;
