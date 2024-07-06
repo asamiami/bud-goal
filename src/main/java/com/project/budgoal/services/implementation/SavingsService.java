@@ -43,7 +43,7 @@ public class SavingsService implements SavingsServ {
             users.setUserRoles(Roles.GROUP_OWNER);
             usersList.add(users);
 
-            savings.setUsersList(usersList);
+            savings.addUsersToUserList(users);
             savings.setTargetAmount(request.amount());
             savings.setStartDate(request.start());
 
@@ -55,7 +55,7 @@ public class SavingsService implements SavingsServ {
             userRepo.save(users);
             savingsRepo.save(savings);
             Period duration = Period.between(request.endDate(), request.start());
-            SavingsResponse savingsResponse = new SavingsResponse(savings.getSavingsName(), duration.getMonths() + " months", savings.getSavingsCategory(), savings.getSavingsMembers(), savings.getTargetAmount(), 0);
+            SavingsResponse savingsResponse = new SavingsResponse(savings.getSavingsName(), duration.getMonths() + " months", savings.getSavingsCategory(), savings.getUsersList().size(), savings.getTargetAmount(), 0);
             return  new ApiResponse<>(savings.getSavingsName() + " Savings created successfully", HttpStatus.CREATED, savingsResponse);
 
         } else {

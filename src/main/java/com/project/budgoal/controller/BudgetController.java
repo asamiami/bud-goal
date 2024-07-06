@@ -6,8 +6,8 @@ import com.project.budgoal.dtos.response.ApiResponse;
 import com.project.budgoal.dtos.response.BudgetResponse;
 import com.project.budgoal.services.BudgetServ;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,40 +22,41 @@ public class BudgetController {
 
 
     @PostMapping("/create-budget")
-    public ResponseEntity<ApiResponse<BudgetResponse>> createBudget (@RequestBody BudgetRequest budgetRequest, @RequestParam Long userId){
-       var response = budgetService.createBudget(budgetRequest, userId);
-        return  new ResponseEntity<>(response, response.getCode());
+    public ApiResponse<BudgetResponse> createBudget (@RequestBody BudgetRequest budgetRequest, @RequestParam Long userId){
+       ApiResponse<BudgetResponse> response = budgetService.createBudget(budgetRequest, userId);
+        return  new ApiResponse<>(response.getMessage(), response.getCode(), response.getData());
     }
 
     @PutMapping ("/add-user/{userId}")
-    public ResponseEntity<ApiResponse<List<BudgetResponse>>> addMembers (@RequestParam Long newUser, @PathVariable Long userId, @RequestParam Long budgetId){
-      var response=  budgetService.addBudgetMembers(userId,newUser,budgetId);
-      return  new ResponseEntity<>(response, response.getCode());
+    public ApiResponse<List<BudgetResponse>> addMembers (@RequestParam Long newUser, @PathVariable Long userId, @RequestParam Long budgetId){
+      ApiResponse<List<BudgetResponse>> response=  budgetService.addBudgetMembers(userId,newUser,budgetId);
+      return  new ApiResponse<>(response.getMessage(), response.getCode(), response.getData());
     }
 
     @GetMapping("/all-budget")
-    public ResponseEntity<ApiResponse<List<BudgetResponse>>> getAllBudget(@RequestParam Long userid){
-        var response = budgetService.allUsersBudget(userid);
-        return  new ResponseEntity<>(response, response.getCode());
+    public ApiResponse<List<BudgetResponse>> getAllBudget(@RequestParam Long userid) {
+        ApiResponse<List<BudgetResponse>> response = budgetService.allUsersBudget(userid);
+        return new ApiResponse<>(response.getMessage(), response.getCode(), response.getData());
     }
 
     @PutMapping("/edit-budget/{userId}")
-    public ResponseEntity<ApiResponse<BudgetResponse>> editBudget (@RequestBody BudgetRequest budgetRequest, @RequestParam Long budgetId){
-        var response =  budgetService.editBudget(budgetId,budgetRequest);
-        return new ResponseEntity<>(response, response.getCode());
+    public ApiResponse<BudgetResponse> editBudget (@RequestBody BudgetRequest budgetRequest, @RequestParam Long budgetId){
+        ApiResponse<BudgetResponse> response =  budgetService.editBudget(budgetId,budgetRequest);
+        return new ApiResponse<>(response.getMessage(), response.getCode(), response.getData());
     }
 
 
     @PostMapping("/add-transaction/{userId}")
-    public ResponseEntity<ApiResponse<BudgetResponse>> addTransaction (@RequestBody TransactionRequest budgetTransaction, @RequestParam Long budgetId){
-        var response =  budgetService.addTransaction(budgetId,budgetTransaction);
-        return new ResponseEntity<>(response, response.getCode());
+    public ApiResponse<BudgetResponse> addTransaction (@RequestBody TransactionRequest budgetTransaction, @RequestParam Long budgetId){
+        ApiResponse<BudgetResponse> response =  budgetService.addTransaction(budgetId,budgetTransaction);
+        return new ApiResponse<>(response.getMessage(), response.getCode(), response.getData());
     }
 
 
     @GetMapping("/view-transactions")
-    public ResponseEntity<ApiResponse<Map<String, Long>>> viewTransactions (@RequestParam Long budgetId){
-        return new ResponseEntity<>(budgetService.viewTransactions(budgetId), HttpStatusCode.valueOf(200));
+    public ApiResponse<Map<String, Long>> viewTransactions (@RequestParam Long budgetId){
+        ApiResponse<Map<String, Long>> response =  budgetService.viewTransactions(budgetId);
+         return new ApiResponse<>(response.getMessage(), response.getCode(), response.getData());
     }
 
 

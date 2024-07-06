@@ -6,8 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.annotations.Array;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +31,7 @@ public class Budget extends BaseEntity {
     private Integer budgetMembers;
 
     @ElementCollection
-    private Map<String, Long> transactions;
+    private Map<String, Long> transactions = new HashMap<>();
 
 
     @ManyToMany
@@ -42,9 +44,9 @@ public class Budget extends BaseEntity {
     private List<Users> usersList = new ArrayList<>();
 
 
-    public boolean addUsersToUserList (Users user){
+    public void addUsersToUserList (Users user){
 
-        return usersList.add(user);
+         usersList.add(user);
 
     }
 

@@ -37,20 +37,15 @@ public class BudgetService implements BudgetServ {
 
         var user = userRepo.findUsersById(userId);
 
-            List<Users> usersList = new ArrayList<>();
-
             Budget newBudget = new Budget();
 
             newBudget.setBudgetAmount(budgetRequest.amount());
             newBudget.setBudgetName(budgetRequest.name());
             newBudget.setBudgetCategory(budgetRequest.budgetCategory());
-            usersList.add(user);
-            newBudget.setUsersList(usersList);
-            newBudget.setBudgetMembers(usersList.size());
+            newBudget.addUsersToUserList(user);
             newBudget.setCreatedDate(LocalDate.now());
             budgetRepo.save(newBudget);
-
-           BudgetResponse budgetResponse= new  BudgetResponse(newBudget.getBudgetName(), newBudget.getBudgetAmount(), newBudget.getTransactions(), newBudget.getBudgetMembers());
+           BudgetResponse budgetResponse= new  BudgetResponse(newBudget.getBudgetName(), newBudget.getBudgetAmount(), newBudget.getTransactions(), newBudget.getUsersList().size());
 
             return   new ApiResponse<>(newBudget.getBudgetName() + " Budget has been created", HttpStatus.CREATED, budgetResponse);
 

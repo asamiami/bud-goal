@@ -10,4 +10,6 @@ public interface AuthServ {
     public ApiResponse<String> registerUser(RegisterDto registerDto);
 
     public ApiResponse<AuthResponse> loginUser(LoginRequest login);
+
+    public ApiResponse<String> verifyEmail(String email, String otp);
 }

@@ -29,7 +29,6 @@ public class Users extends BaseEntity implements UserDetails {
 
     private String nickName;
 
-    private String verificationCode;
 
     @Enumerated
     private Roles userRoles ;
@@ -41,6 +40,8 @@ public class Users extends BaseEntity implements UserDetails {
 
 
     private String password;
+
+    private String otp;
 
 
     @Override

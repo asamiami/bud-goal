@@ -6,9 +6,8 @@ import com.project.budgoal.dtos.response.ApiResponse;
 import com.project.budgoal.dtos.response.SavingsResponse;
 import com.project.budgoal.dtos.response.UserResponse;
 import com.project.budgoal.services.SavingsServ;
-import com.project.budgoal.services.implementation.SavingsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,41 +21,41 @@ public class SavingsController {
     private final SavingsServ savingsService;
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<SavingsResponse>> createSavings (@RequestBody SavingsRequest savingsRequest, @RequestParam Long user){
-        var response = savingsService.createSavings(savingsRequest,user);
-        return new ResponseEntity<>(response, response.getCode());
+    public ApiResponse<SavingsResponse> createSavings (@RequestBody SavingsRequest savingsRequest, @RequestParam Long user){
+        ApiResponse<SavingsResponse> response = savingsService.createSavings(savingsRequest,user);
+        return new ApiResponse<>(response.getMessage(), response.getCode(), response.getData());
     }
 
 
     @PutMapping("/add-user/{user}")
-    public ResponseEntity<ApiResponse<List<SavingsResponse>>> addMember (@RequestParam Long newUser, @RequestParam Long savingsId, @PathVariable Long user){
-        var response = savingsService.addMembers(user,newUser,savingsId);
-        return new ResponseEntity<>(response, response.getCode());
+    public ApiResponse<List<SavingsResponse>> addMember (@RequestParam Long newUser, @RequestParam Long savingsId, @PathVariable Long user){
+        ApiResponse<List<SavingsResponse>> response = savingsService.addMembers(user,newUser,savingsId);
+        return new ApiResponse<>(response.getMessage(), response.getCode(), response.getData());
     }
 
     @GetMapping("/all-savings")
-    public ResponseEntity<ApiResponse<List<SavingsResponse>>> allSavings ( @RequestParam Long userId){
-       var response = savingsService.viewAllSavings(userId);
-       return new ResponseEntity<>(response,response.getCode());
+    public ApiResponse<List<SavingsResponse>> allSavings ( @RequestParam Long userId){
+       ApiResponse<List<SavingsResponse>> response = savingsService.viewAllSavings(userId);
+       return new ApiResponse<>(response.getMessage(),response.getCode(), response.getData());
     }
 
     @GetMapping("/all-members")
-    public ResponseEntity<ApiResponse<List<UserResponse>>> allMembers (@RequestParam Long savingsId){
-        var response = savingsService.viewMembers(savingsId);
-        return new ResponseEntity<>(response,response.getCode());
+    public ApiResponse<List<UserResponse>> allMembers (@RequestParam Long savingsId){
+        ApiResponse<List<UserResponse>> response = savingsService.viewMembers(savingsId);
+        return new ApiResponse<>(response.getMessage(),response.getCode(), response.getData());
     }
 
     @PostMapping("/add-transaction")
-    public ResponseEntity<ApiResponse<SavingsResponse>> addTransaction(@RequestParam Long savingsId, @RequestBody TransactionRequest transactionRequest, @RequestParam Long userId){
-        var response = savingsService.addTransaction(savingsId, transactionRequest, userId);
-        return new ResponseEntity<>(response, response.getCode());
+    public ApiResponse<SavingsResponse> addTransaction(@RequestParam Long savingsId, @RequestBody TransactionRequest transactionRequest, @RequestParam Long userId){
+        ApiResponse<SavingsResponse> response = savingsService.addTransaction(savingsId, transactionRequest, userId);
+        return new ApiResponse<>(response.getMessage(), response.getCode(), response.getData());
     }
 
     @GetMapping("/view-transactions")
-    public ResponseEntity<ApiResponse<Map<String, Long>>> viewTransactions (@RequestParam Long savingsId){
-        var response = savingsService.viewTransaction(savingsId);
-        return new ResponseEntity<>(response, response.getCode());
+    public ApiResponse<Map<String, Long>> viewTransactions (@RequestParam Long savingsId){
+        ApiResponse<Map<String,Long>> response = savingsService.viewTransaction(savingsId);
+        return new ApiResponse<>(response.getMessage(), response.getCode(), response.getData());
     }
 
-    }
+}
 
